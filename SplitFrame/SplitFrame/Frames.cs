@@ -7,43 +7,46 @@ using System.Threading.Tasks;
 
 namespace SplitFrame
 {
+    /// <summary>
+    /// 帧图相关类
+    /// </summary>
     [Serializable]
     public class Frames
     {
-        private double _time;
+        private double time;
 
-        private Image _image;
+        private Image image;
 
-        private string _name;
+        private string name;
 
-        private int _frameName;
+        private int frameName;
         public int FrameName
         {
-            get { return this._frameName; }
+            get { return this.frameName; }
         }
 
         public double Time
         {
-            get { return this._time; }
+            get { return this.time; }
         }
 
         public Image Image
         {
-            get { return this._image; }
+            get { return this.image; }
         }
 
         public Frames(double time, Image image, string name)
         {
-            this._time = time;
-            this._image = image;
-            this._name = name;
+            this.time = time;
+            this.image = image;
+            this.name = name;
             try
             {
-                this._frameName = Int32.Parse(name);
+                this.frameName = Int32.Parse(name);
             }
             catch (Exception e)
             {
-                this._frameName = 0;
+                this.frameName = 0;
             }
         }
     }

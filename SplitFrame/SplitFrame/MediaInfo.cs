@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace SplitFrame
 {
+    /// <summary>
+    /// 视频信息类，视频长、宽、长度、帧率等
+    /// </summary>
     public class MediaInfo
     {
         public int MediaWidth;

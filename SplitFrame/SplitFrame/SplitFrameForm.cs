@@ -14,9 +14,10 @@ namespace SplitFrame
 {
     public partial class SplitFrameForm : Form
     {
-        private string _videoFileName;
+        //视频文件名
+        private string videoFileName;
 
-        private bool _canStep = false;
+        private bool canStep = false;
         /// <summary>
         /// 处理视频相关DirectShowLib接口
         /// </summary>
@@ -27,6 +28,9 @@ namespace SplitFrame
         private IVideoFrameStep frameStep = null;
         private IVideoWindow videoWin = null;
 
+        /// <summary>
+        /// 处理视频相关DirectShowLib常量
+        /// </summary>
         private const int WM_GRAPHNOTIFY = 0x00008001;
         private const int WS_CHILD = 0x40000000;
         private const int WS_CLIPCHILDREN = 0x02000000;
@@ -34,7 +38,7 @@ namespace SplitFrame
         private const int WM_MOVE = 0x00000003;
         private const int EC_COMPLETE = 0x00000001;
 
-        private GrabFrames _grabFrames;
+        private GrabFrames grabFrames;
         public delegate void ReportProgress(double progress);
 
         public SplitFrameForm()
@@ -75,7 +79,7 @@ namespace SplitFrame
             mediaCtrl = null;
             mediaEvt = null;
             mediaPos = null;
-            if (_canStep)
+            if (canStep)
                 frameStep = null;
             videoWin = null;
             if (graphBuilder != null)
@@ -91,24 +95,28 @@ namespace SplitFrame
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 CloseInterfaces();
-                _videoFileName = openFileDialog.FileName;
-                this.txtSelectDirectory.Text = _videoFileName;
+                videoFileName = openFileDialog.FileName;
+                this.txtSelectDirectory.Text = videoFileName;
                 InitInterfaces();
                 var folder = System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                SplitFrame(_videoFileName, folder);
+                SplitFrame(videoFileName, folder);
             }
         }
 
         private void SplitFrame(string fileName, string folder)
         {
-            _grabFrames = new GrabFrames(fileName);
-            _grabFrames.StoragePath = folder;
-            _grabFrames.ReportProgressHandler += ReportProgressHandler;
+            grabFrames = new GrabFrames(fileName);
+            grabFrames.StoragePath = folder;
+            grabFrames.ReportProgressHandler += ReportProgressHandler;
             this.progressBar.Visible = true;
             SetResult(false);
             this.btnSelect.Enabled = false;
         }
 
+        /// <summary>
+        /// 进度条
+        /// </summary>
+        /// <param name="progress"></param>
         private void ReportProgressHandler(double progress)
         {
             if (this.progressBar.InvokeRequired)
@@ -118,7 +126,7 @@ namespace SplitFrame
             }
             else
             {
-                int value = (int)((progress + 1) * 100 / (this._grabFrames.MediaInfo.Duration * this._grabFrames.MediaInfo.FPS));
+                int value = (int)((progress + 1) * 100 / (this.grabFrames.MediaInfo.Duration * this.grabFrames.MediaInfo.FPS));
                 if (value >= 100)
                 {
                     this.progressBar.Value = 0;
@@ -130,20 +138,29 @@ namespace SplitFrame
             }
         }
 
+        /// <summary>
+        /// 显示结果
+        /// </summary>
+        /// <param name="isEnable"></param>
         private void SetResult(bool isEnable)
         {
             this.linkLabel1.Visible = isEnable;
             if (isEnable)
-                this.linkLabel1.Text = string.Format("{0}\\{1}", System.Environment.CurrentDirectory, _grabFrames.StoragePath);
+                this.linkLabel1.Text = string.Format("{0}\\{1}", System.Environment.CurrentDirectory, grabFrames.StoragePath);
             else
                 this.linkLabel1.Text = "";
         }
 
+        /// <summary>
+        /// 点击跳转到文件夹
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
-                System.Diagnostics.Process.Start("Explorer.exe", _grabFrames.Folder);
+                System.Diagnostics.Process.Start("Explorer.exe", grabFrames.Folder);
             }
             catch (Exception ee)
             {
